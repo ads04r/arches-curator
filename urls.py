@@ -1,7 +1,6 @@
-from django.urls import path
-
-from . import views
+from django.urls import re_path
+from curator.views.curator import Curator
 
 urlpatterns = [
-	path("", views.index, name="index"),
+	re_path(r"^curator/", Curator.as_view(), name="curator"),
 ]
