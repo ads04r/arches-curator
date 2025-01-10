@@ -8,7 +8,7 @@ class CuratedDataset(models.Model):
 	may change if the user or time is different."""
 	search_id = models.UUIDField(primary_key=True)
 	search_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='curated_datasets')
-	search_url = models.URLField()
+	search_url = models.URLField(max_length=2048)
 	"""The URL called in order to instigate this search."""
 	search_results = models.JSONField(default='{}')
 	"""A GeoJSON object representing the results of this search, as they would have been presented to the user."""
@@ -20,6 +20,6 @@ class CuratedDataset(models.Model):
 	class Meta:
 
 		db_table = "curated_dataset"
-		managed = False
+		managed = True
 		verbose_name = 'curated dataset'
 		verbose_name_plural = 'curated datasets'
