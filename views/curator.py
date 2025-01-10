@@ -8,23 +8,22 @@ from ..models import CuratedDataset
 @method_decorator(csrf_exempt, name="dispatch")
 class Curator(View):
 
-    def serialize_datasets(self):
-        res = [str(dataset.search_id) for dataset in CuratedDataset.objects.all()]
-        return res
+	def serialize_datasets(self, user_id):
+		res = [{'id': str(dataset.search_id), 'label': dataset.search_label, 'results': dataset.search_results_count} for dataset in CuratedDataset.objects.filter(search_user__id=user_id)]
+		return res
 
-    def get(self, request):
-        data = {
-            "records": self.serialize_datasets(),
-            "resource_count": ResourceInstance.objects.count(),
-            "tile_count": TileModel.objects.count(),
-        }
-        return JsonResponse(data)
+	def get(self, request):
+		user = request.user
+		if not user.is_authenticated:
+			return JsonResponse({"datasets": []})
+		data = {"records": self.serialize_datasets(user.id)}
+		return JsonResponse(data)
 
-    def post(self, request):
-        state = {
-            "resources": ResourceInstance.objects.count(),
-            "tiles": TileModel.objects.count()
-        }
-        data = {"records": self.serialize_datasets()}
-        return JsonResponse(data)
+	def post(self, request):
+		state = {
+			"resources": ResourceInstance.objects.count(),
+			"tiles": TileModel.objects.count()
+		}
+		data = {"records": self.serialize_datasets()}
+		return JsonResponse(data)
 

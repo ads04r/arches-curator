@@ -62,32 +62,30 @@
 
 </style>
 
+<div class="scroll-y">
+
+    <div class="resource-toolbar">
+        <h1>Curated Datasets</h1>
+    </div>
+    <div id="page-content">
+
 <!--ko ifnot: $data.loading -->
-<div class="curator-container">
-    <div class="curator-summary">
-        <h1>Current Summary</h1>
-        <div class="summary-item">
-            <h2>Resources:</h2>
-            <div data-bind="text: $data.resourceCount"></div>
-        </div>
-        <div class="summary-item">
-            <h2>Tiles:</h2>
-            <div data-bind="text: $data.tileCount"></div>
-        </div>
-        <button class="btn btn-primary" style="width: fit-content; margin-top: 5px" data-bind="click: $data.saveStatus">Record Summary</button>
-        <div class="curator-history">
-            <h1>Summary History</h1>
-            <div class="curator-history-grid">
-                <h2 class="history-item">Resources:</h2>
-                <h2 class="history-item">Tiles:</h2>
-                <h2 class="history-item" style="width:135px">Recorded:</h2>
-                <!--ko foreach: $data.records  -->
-                <div class="history-item" style="padding: 2px;" data-bind="text:$data.resources"></div>
-                <div class="history-item" style="padding: 2px;" data-bind="text:$data.tiles"></div>
-                <div class="history-item" style="padding: 2px; width: 135px" data-bind="text:$data.statetime"></div>
-                <!--/ko -->
-            </div>
+
+        <div class="report-image-grid" id="report-image-grid">
+            <!--ko foreach: $data.records  -->
+            <div class="resource-grid-item">
+            <a href="#" data-bind="attr: { href: '/curator/' + $data.id }">
+                <h1 class="page-header text-overflow resource-grid-title">
+                    <i class="fa fa-table icon-wrap resource-grid-icon"></i>
+                    <span data-bind="text:$data.label"></span>
+                </h1>
+                <p class="resource-grid-subtitle"><span data-bind="text:$data.results"></span> items</p>
+                <p><span data-bind="text:$parent.arches.urls.graph_designer($data.id)"></span></p>
+            </a></div>
+            <!--/ko -->
         </div>   
+
+<!--/ko-->
+
     </div>
 </div>
-<!--/ko-->
