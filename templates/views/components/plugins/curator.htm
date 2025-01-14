@@ -74,7 +74,7 @@
         <div class="report-image-grid" id="report-image-grid">
             <!--ko foreach: $data.records  -->
             <div class="resource-grid-item">
-            <a href="#" data-bind="attr: { href: '/curator/' + $data.id }">
+            <a href="#" data-bind="attr: { href: '{% url 'curator' %}' + $data.id }">
                 <h1 class="page-header text-overflow resource-grid-title">
                     <i class="fa fa-table icon-wrap resource-grid-icon"></i>
                     <span data-bind="text:$data.label"></span>
