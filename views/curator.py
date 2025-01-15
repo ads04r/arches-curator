@@ -24,6 +24,6 @@ class Curator(View):
 			"resources": ResourceInstance.objects.count(),
 			"tiles": TileModel.objects.count()
 		}
-		data = {"records": self.serialize_datasets()}
+		data = {"records": self.serialize_datasets(0)}
 		return JsonResponse(data)
 
