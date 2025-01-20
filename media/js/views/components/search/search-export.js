@@ -116,7 +116,7 @@ define([
             }).done(function(retData, status, req) {
                 var id = retData.id;
                 var url = window.location.origin + '/curator/' + id;
-                alert(url);
+                window.open(url);
             });
         };
 
