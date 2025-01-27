@@ -8,12 +8,12 @@ define([
     const CuratorViewModel = function() {
         const self = this;
         this.loading = ko.observable(true);
-        this.records = ko.observable();
+        this.datasets = ko.observable();
 
         this.getStatus = async function() {
-            const response = await window.fetch("/curator");
+            const response = await fetch("/curator");
             const data = await response.json();
-            self.records(data.records);
+            self.datasets(data.datasets);
             self.loading(false);
         };
 
@@ -26,7 +26,7 @@ define([
                 }
             });
             const data = await response.json();
-            self.records(data.records);
+            self.datasets(data.datasets);
         };
 
         this.getStatus();

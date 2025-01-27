@@ -21,6 +21,10 @@ class CuratedDataset(models.Model):
 	updated_time = models.DateTimeField(auto_now=True)
 	"""A datetime representing the time this Event object was last modified."""
 
+	@property
+	def saved(self):
+		return not('search_url' in self.search_results)
+
 	class Meta:
 
 		db_table = "curated_dataset"

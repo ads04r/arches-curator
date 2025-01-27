@@ -1,0 +1,65 @@
+{% extends "base-manager.htm" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %} {{ block.super }} {{ plugin.name }} {% endblock title %}
+
+#        search_id = models.UUIDField(primary_key=True)
+#        search_label = models.CharField(max_length=128, default='', blank=True, null=False)
+#        search_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='curated_datasets')
+#        """The user who was logged in when this search was performed."""
+#        search_url = models.URLField(max_length=2048)
+#        """The URL called in order to instigate this search."""
+#        search_results = models.JSONField(default='{}')
+#        """A GeoJSON object representing the results of this search, as they would have been presented to the user."""
+#        search_results_count = models.IntegerField()
+
+{% block main_content %}
+
+
+<div class="content-panel">
+	<div class="flex plugin-main">
+		<div class="scroll-y">
+			<div id="page-content">
+
+{% if dataset.saved %}
+
+<table>
+	<tr>
+		<th>Title:&nbsp;</th>
+		<td>{{ dataset.search_label }}</td>
+	</tr>
+	<tr>
+		<th>URL:&nbsp;</th>
+		<td>{{ dataset.search_url }}</td>
+	</tr>
+	<tr>
+		<th>Results:&nbsp;</th>
+		<td><textarea>{{ dataset.search_results }}</textarea></td>
+	</tr>
+</table>
+
+{% else %}
+
+Not saved yet.
+
+<textarea>{{ dataset.search_url }}</textarea>
+
+{% endif %}
+
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock main_content %}
+
+{% block pre_require_js %}
+{{block.super}}
+    <div
+        id="pluginData"
+        style="display: none;"
+        pluginData='{{ plugin_json }}'
+    ></div>
+{% endblock pre_require_js %}
+

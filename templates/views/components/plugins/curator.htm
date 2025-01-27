@@ -1,91 +1,17 @@
-{% load i18n %} 
-
-<style>
-    h1 {
-        font-size: medium;
-        font-weight: 600;
-    }
-    h2 {
-        font-size: small;
-        font-weight: 600;
-        margin: 6px 0 3px;
-    }
-
-    .curator-container {
-        background-color: #fff;
-        color: #386ea4;
-        border-style: solid 1px #eee;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: baseline;
-        width: 100%;
-        height: inherit;
-        padding-top: 25px;
-    }
-
-    .curator-summary {
-        width: 320px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: left;
-        height: inherit;
-        padding: 0 20px;
-    }
-
-    .summary-item {
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: baseline;
-    }
-
-    .curator-history {
-        width: 320px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: left;
-        height: inherit;
-        padding: 20px 0;
-    }
-
-    .curator-history-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .curator-history-grid .history-item {
-        padding: 5px 0;
-        text-align: left;
-    }
-
-</style>
-
 <div class="scroll-y">
 
-    <div class="resource-toolbar">
-        <h1>Curated Datasets</h1>
-    </div>
     <div id="page-content">
 
 <!--ko ifnot: $data.loading -->
 
-        <div class="report-image-grid" id="report-image-grid">
-            <!--ko foreach: $data.records  -->
-            <div class="resource-grid-item">
-            <a href="#" data-bind="attr: { href: '{% url 'curator' %}' + $data.id }">
-                <h1 class="page-header text-overflow resource-grid-title">
-                    <i class="fa fa-table icon-wrap resource-grid-icon"></i>
-                    <span data-bind="text:$data.label"></span>
-                </h1>
-                <p class="resource-grid-subtitle"><span data-bind="text:$data.results"></span> items</p>
-                <p><span data-bind="text:$parent.arches.urls.graph_designer($data.id)"></span></p>
-            </a></div>
-            <!--/ko -->
-        </div>   
+<!--ko foreach: { data: $data.datasets, as: 'item' } -->
 
-<!--/ko-->
+	<p><span data-bind="text:item.label"></span> (<span data-bind="text:item.results"></span> records)</p>
+
+<!-- /ko -->
+
+<!-- /ko -->
 
     </div>
+
 </div>

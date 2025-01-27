@@ -115,7 +115,7 @@ define([
                 data: JSON.stringify({"id": "", "title": "", "results": this.total(), "url": this.searchUrl(), "geojson": this.geojsonUrl()})
             }).done(function(retData, status, req) {
                 var id = retData.id;
-                var url = window.location.origin + '/curator/' + id;
+                var url = window.location.origin + '/plugins/curator/' + id;
                 window.open(url);
             });
         };
