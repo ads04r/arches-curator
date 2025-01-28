@@ -4,18 +4,7 @@
 
 {% block title %} {{ block.super }} {{ plugin.name }} {% endblock title %}
 
-#        search_id = models.UUIDField(primary_key=True)
-#        search_label = models.CharField(max_length=128, default='', blank=True, null=False)
-#        search_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='curated_datasets')
-#        """The user who was logged in when this search was performed."""
-#        search_url = models.URLField(max_length=2048)
-#        """The URL called in order to instigate this search."""
-#        search_results = models.JSONField(default='{}')
-#        """A GeoJSON object representing the results of this search, as they would have been presented to the user."""
-#        search_results_count = models.IntegerField()
-
 {% block main_content %}
-
 
 <div class="content-panel">
 	<div class="flex plugin-main">
@@ -41,9 +30,16 @@
 
 {% else %}
 
-Not saved yet.
+<form id="search_name_form" action="" method="POST" style="width: 100%;">
 
-<textarea>{{ dataset.search_url }}</textarea>
+<p>Enter a descriptive name for the dataset returned by this search.</p>
+
+<label>Dataset name: <input type="text" name="datasetname" class="form-control"/></label>
+
+<input type="submit" class="btn btn-success" value="Save">{% csrf_token %}
+<a class="btn btn-danger" href="{{ dataset.search_url }}">Cancel</a>
+
+</form>
 
 {% endif %}
 

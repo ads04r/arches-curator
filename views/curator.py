@@ -2,7 +2,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View, TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponseRedirect
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -12,6 +12,8 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from uuid import uuid4
 from ..models import CuratedDataset
+from ..utils import local_api_search
+
 import json, datetime, pytz, urllib.parse
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -43,23 +45,32 @@ class Curator(View):
 			ret = get_object_or_404(CuratedDataset, search_id=request_data['id'])
 		if user.id != ret.search_user.id:
 			raise Http404()
+		fields = []
 		if 'title' in request_data:
 			if len(request_data['title']) > 0:
 				ret.search_label = request_data['title']
+				fields.append('search_label')
 		if 'results' in request_data:
 			ret.search_results = int(request_data['results'])
+			fields.append('search_results')
 		if 'url' in request_data:
 			if len(request_data['url']) > 0:
-				ret.search_url = request_data['url']
+				ret.search_url = request_data['url'].replace('/export_results?', '?')
+				fields.append('search_url')
 		if 'geojson' in request_data:
 			if len(request_data['geojson']) > 0:
 				ret.search_results = {"search_url": request_data['geojson'], "features": [], "type": "FeatureCollection"}
-		ret.save()
+				fields.append('search_results')
+		if ((len(request_data['id']) == 0) or (len(fields) == 0)):
+			ret.save()
+		else:
+			ret.save(update_fields=fields)
 
 		data = {"id": ret.search_id, "datasets": self.serialize_datasets(user.id)}
 		return JsonResponse(data)
 
 class CuratorReport(PluginView):
+
 	def get(self, request, searchid=None):
 
 		plugin = models.Plugin.objects.get(slug='curator')
@@ -113,3 +124,31 @@ class CuratorReport(PluginView):
 		context['dataset'] = dataset
 
 		return render(request, "views/curator.htm", context)
+
+	def post(self, request, searchid=None):
+
+		user = request.user
+		if not user.is_authenticated:
+			raise Http404()
+		dataset = get_object_or_404(CuratedDataset, search_id=searchid)
+		if user.id != dataset.search_user.id:
+			raise Http404()
+
+		try:
+			data = local_api_search(dataset.search_results['search_url'], user)
+		except:
+			data = {}
+		if len(data) == 0:
+			raise Http404()
+		if not 'features' in data:
+			raise Http404()
+		result_count = len(data['features'])
+		if result_count == 0:
+			raise Http404()
+
+		dataset.search_results = data
+		dataset.search_results_count = result_count
+		dataset.search_label = request.POST['datasetname']
+		dataset.save(update_fields=['search_results', 'search_results_count', 'search_label'])
+
+		return HttpResponseRedirect(request.path)
