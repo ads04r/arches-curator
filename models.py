@@ -25,6 +25,44 @@ class CuratedDataset(models.Model):
 	def saved(self):
 		return not('search_url' in self.search_results)
 
+	def table_headers(self):
+		if not self.saved:
+			return []
+		if not 'features' in self.search_results:
+			return []
+		ret = []
+		for feature in self.search_results['features']:
+			if not 'properties' in feature:
+				continue
+			for kk in feature['properties'].keys():
+				k = str(kk)
+				if k in ret:
+					continue
+				if feature['properties'][k] is None:
+					continue
+				ret.append(k)
+		return ret
+
+	def table_data(self):
+		headers = self.table_headers()
+		if len(headers) == 0:
+			return []
+		ret = []
+		for feature in self.search_results['features']:
+			if not 'properties' in feature:
+				continue
+			row = []
+			for k in headers:
+				if k in feature['properties']:
+					if feature['properties'][k] is None:
+						row.append('')
+					else:
+						row.append(feature['properties'][k])
+				else:
+					row.append('')
+			ret.append(row)
+		return ret
+
 	class Meta:
 
 		db_table = "curated_dataset"

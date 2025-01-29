@@ -6,27 +6,55 @@
 
 {% block main_content %}
 
-<div class="content-panel">
+<div class="content-panel" style="max-width: 80em !important;">
 	<div class="flex plugin-main">
 		<div class="scroll-y">
-			<div id="page-content">
+			<div id="page-content" style="width: 100% !important;">
 
 {% if dataset.saved %}
 
-<table>
+<div class="table-responsive" style="max-width: 90%;">
+<table class="table">
 	<tr>
-		<th>Title:&nbsp;</th>
+		<td><strong>Title:</strong>&nbsp;</td>
 		<td>{{ dataset.search_label }}</td>
 	</tr>
 	<tr>
-		<th>URL:&nbsp;</th>
-		<td>{{ dataset.search_url }}</td>
+		<td><strong>URL:</strong>&nbsp;</td>
+		<td><a href="{{ dataset.search_url }}">{{ dataset.search_url|truncatechars:80 }}</a></td>
 	</tr>
 	<tr>
-		<th>Results:&nbsp;</th>
-		<td><textarea>{{ dataset.search_results }}</textarea></td>
+		<td><strong>Results:</strong>&nbsp;</td>
+		<td>{{ dataset.search_results_count }}</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>
+			<button class="btn btn-primary">Upload to Zenodo</button>
+			<button class="btn btn-primary">Pin to IPFS</button>
+		</td>
 	</tr>
 </table>
+</div>
+
+<div class="table-responsive" style="max-width: 90%;">
+<table class="table table-condensed">
+
+	<tr>
+{% for header in dataset.table_headers %}
+		<th><nobr>{{ header|truncatechars:20 }}</nobr></th>
+{% endfor %}
+	</tr>
+{% for row in dataset.table_data %}
+	<tr>
+{% for item in row %}
+		<td><nobr>{{ item|truncatechars:20 }}</nobr></td>
+{% endfor %}
+	</tr>
+{% endfor %}
+
+</table>
+</div>
 
 {% else %}
 
