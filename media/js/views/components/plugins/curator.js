@@ -29,6 +29,10 @@ define([
             self.datasets(data.datasets);
         };
 
+        this.uploadZenodo = function(){
+                console.log("Zenodo upload.");
+        };
+
         this.getStatus();
     };
 

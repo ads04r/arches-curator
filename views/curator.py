@@ -3,6 +3,7 @@ from django.views.generic import View, TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse, Http404, HttpResponseRedirect
+from django.template.defaultfilters import slugify
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -12,7 +13,9 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from uuid import uuid4
 from ..models import CuratedDataset
-from ..utils import local_api_search
+from ..util.arches import local_api_search
+from ..util.zip import save_zip
+from ..zenodo.publish import zenodo_publish
 
 import json, datetime, pytz, urllib.parse
 
@@ -152,3 +155,23 @@ class CuratorReport(PluginView):
 		dataset.save(update_fields=['search_results', 'search_results_count', 'search_label'])
 
 		return HttpResponseRedirect(request.path)
+
+@method_decorator(csrf_exempt, name="dispatch")
+class CuratorReportZenodo(View):
+
+	def post(self, request, searchid=None):
+
+		user = request.user
+		if not user.is_authenticated:
+			raise Http404()
+		dataset = get_object_or_404(CuratedDataset, search_id=searchid)
+		if user.id != dataset.search_user.id:
+			raise Http404()
+		if not dataset.saved:
+			raise Http404()
+
+		filename = slugify(dataset.search_label)
+		zip_filename = save_zip(dataset.search_results, filename)
+		url = zenodo_publish(dataset.search_label, zip_filename, dataset.search_label)
+
+		return HttpResponseRedirect(url)
