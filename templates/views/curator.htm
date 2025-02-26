@@ -19,6 +19,12 @@
 		<td><strong>Title:</strong>&nbsp;</td>
 		<td>{{ dataset.search_label }}</td>
 	</tr>
+{% if dataset.zenodo_doi %}
+	<tr>
+		<td><strong>DOI:</strong>&nbsp;</td>
+		<td><a href="{{ dataset.zenodo_doi }}">{{ dataset.zenodo_doi|truncatechars:80 }}</a></td>
+	</tr>
+{% endif %}
 	<tr>
 		<td><strong>URL:</strong>&nbsp;</td>
 		<td><a href="{{ dataset.search_url }}">{{ dataset.search_url|truncatechars:80 }}</a></td>

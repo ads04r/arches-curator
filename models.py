@@ -21,6 +21,11 @@ class CuratedDataset(models.Model):
 	updated_time = models.DateTimeField(auto_now=True)
 	"""A datetime representing the time this Event object was last modified."""
 
+	zenodo_url = models.URLField(max_length=512, null=True, blank=True)
+	"""The URL at which this dataset appears on Zenodo."""
+	zenodo_doi = models.URLField(max_length=128, blank=True, null=True)
+	"""The DOI referring to this dataset on Zenodo."""
+
 	@property
 	def saved(self):
 		return not('search_url' in self.search_results)

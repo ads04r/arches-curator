@@ -171,6 +171,9 @@ class CuratorReportZenodo(View):
 		if not dataset.saved:
 			raise Http404()
 
+		if not dataset.zenodo_url is None:
+			return HttpResponseRedirect(dataset.zenodo_url)
+
 		filename = slugify(dataset.search_label)
 		data = dataset.search_results
 		zip_filename = save_zip(data, filename)
@@ -179,6 +182,10 @@ class CuratorReportZenodo(View):
 		except:
 			zd = []
 		zenodo_calculated_fields = [zenodo_contributors(data), zenodo_keywords(data, additional=[]), zd]
-		url = zenodo_publish(dataset.search_label, zip_filename, dataset.search_label, zenodo_calculated_fields)
+		url, doi = zenodo_publish(dataset.search_label, zip_filename, dataset.search_label, zenodo_calculated_fields)
+
+		dataset.zenodo_url = url
+		dataset.zenodo_doi = doi
+		dataset.save(update_fields=['zenodo_url', 'zenodo_doi'])
 
 		return HttpResponseRedirect(url)

@@ -31,18 +31,17 @@ def zenodo_contributors(data):
 	for fieldname in settings.ZENODO_METADATA['contributors']['fields']:
 		for feature in data['features']:
 			if fieldname in feature['properties']:
-				name = feature['properties'][fieldname]
-				if name is None:
+				if feature['properties'][fieldname] is None:
 					continue
-				if name.strip() == '':
-					continue
-				if name.strip() == ',':
-					continue
-				if name.strip() == 'None':
-					continue
-				if not name in values:
-					values[name] = 0
-				values[name] = values[name] + 1
+				for name in feature['properties'][fieldname].strip().split(','):
+					name_s = name.strip()
+					if name_s == '':
+						continue
+					if name_s == 'None':
+						continue
+					if not name_s in values:
+						values[name_s] = 0
+					values[name_s] = values[name_s] + 1
 	ret = []
 	for item in list(x[0] for x in sorted(list([k, v] for k, v in values.items()), key=lambda x: x[1], reverse=True)):
 		v = settings.ZENODO_METADATA['contributors']['layout'].copy()
@@ -74,6 +73,10 @@ def zenodo_keywords(data, additional = None):
 			KEYWORDS = KEYWORDS + df['name'].tolist()
 		try:
 			KEYWORDS.remove('Unknown')
+		except ValueError:
+			pass
+		try:
+			KEYWORDS.remove('')
 		except ValueError:
 			pass
 	return KEYWORDS

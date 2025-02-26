@@ -47,4 +47,5 @@ def zenodo_publish(title, filename, description, extra_metadata=None):
 	add_zenodo_metadata(deposition_id, params, metadata)
 	r = requests.post('%s/%s/actions/publish' % (settings.ZENODO_URL, deposition_id), params={'access_token': settings.ZENODO_ACCESS_TOKEN} )
 	data = r.json()
-	return data['links']['html']
+
+	return data['links']['html'], data['links']['doi']
