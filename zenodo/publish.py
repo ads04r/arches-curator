@@ -27,7 +27,7 @@ def add_zenodo_metadata(deposition_id, params, metadata):
 
 def zenodo_publish(title, filename, description, extra_metadata=None):
 
-	metadata = settings.ZENODO_METADATA
+	metadata = {'metadata': settings.ZENODO_METADATA['metadata']}
 
 	params = {'access_token': settings.ZENODO_ACCESS_TOKEN}
 	deposition_id, bucket_url = create_zenodo_bucket(params)
@@ -40,9 +40,9 @@ def zenodo_publish(title, filename, description, extra_metadata=None):
 	if isinstance(extra_metadata, list): # backwards compatibility
 		if len(extra_metadata) > 0:
 			metadata['metadata']['contributors'] = extra_metadata[0]
-		if len(extra_metadata) > 0:
+		if len(extra_metadata) > 1:
 			metadata['metadata']['keywords'] = extra_metadata[1]
-		if len(extra_metadata) > 0:
+		if len(extra_metadata) > 2:
 			metadata['metadata']['dates'] = extra_metadata[2]
 	add_zenodo_metadata(deposition_id, params, metadata)
 	r = requests.post('%s/%s/actions/publish' % (settings.ZENODO_URL, deposition_id), params={'access_token': settings.ZENODO_ACCESS_TOKEN} )

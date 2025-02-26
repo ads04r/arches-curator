@@ -16,6 +16,7 @@ from ..models import CuratedDataset
 from ..util.arches import local_api_search
 from ..util.zip import save_zip
 from ..zenodo.publish import zenodo_publish
+from ..zenodo.calculate import zenodo_contributors, zenodo_keywords, zenodo_dates
 
 import json, datetime, pytz, urllib.parse
 
@@ -171,7 +172,13 @@ class CuratorReportZenodo(View):
 			raise Http404()
 
 		filename = slugify(dataset.search_label)
-		zip_filename = save_zip(dataset.search_results, filename)
-		url = zenodo_publish(dataset.search_label, zip_filename, dataset.search_label)
+		data = dataset.search_results
+		zip_filename = save_zip(data, filename)
+		try:
+			zd = zenodo_dates(data)
+		except:
+			zd = []
+		zenodo_calculated_fields = [zenodo_contributors(data), zenodo_keywords(data, additional=[]), zd]
+		url = zenodo_publish(dataset.search_label, zip_filename, dataset.search_label, zenodo_calculated_fields)
 
 		return HttpResponseRedirect(url)

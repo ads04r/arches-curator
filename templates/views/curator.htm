@@ -31,8 +31,8 @@
 		<td></td>
 		<td>
 			<table><!--// Doing HTML like it's 1997 //-->
-			<td><form id="search_zenodo_form" action="./{{ dataset.pk }}/zenodo" method="POST" style="position: relative;"><input type="submit" class="btn btn-primary" value="Upload to Zenodo">{% csrf_token %}</form></td>
-			<td><form id="search_ipfs_form" action="./{{ dataset.pk }}/ipfs" method="POST" style="position: relative;"><input type="submit" class="btn btn-primary" value="Pin to IPFS">{% csrf_token %}</form></td>
+			<td><form id="search_zenodo_form" action="./{{ dataset.pk }}/zenodo" method="POST" style="position: relative;"><input type="submit" class="btn btn-primary" value="Upload to Zenodo">{% csrf_token %}</form></td><td>&nbsp;</td>
+			<td><form id="search_ipfs_form" action="./{{ dataset.pk }}/ipfs" method="POST" style="position: relative;"><input type="submit" class="btn btn-primary" value="Pin to IPFS">{% csrf_token %}</form></td><td>&nbsp;</td>
 			</table>
 		</td>
 	</tr>
