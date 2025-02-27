@@ -18,7 +18,7 @@ from ..util.zip import save_zip
 from ..zenodo.publish import zenodo_publish
 from ..zenodo.calculate import zenodo_contributors, zenodo_keywords, zenodo_dates
 
-import json, datetime, pytz, urllib.parse
+import json, datetime, pytz, urllib.parse, ipfslib
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Curator(View):
@@ -189,3 +189,37 @@ class CuratorReportZenodo(View):
 		dataset.save(update_fields=['zenodo_url', 'zenodo_doi'])
 
 		return HttpResponseRedirect(url)
+
+@method_decorator(csrf_exempt, name="dispatch")
+class CuratorReportIPFS(View):
+
+	def post(self, request, searchid=None):
+
+		user = request.user
+		if not user.is_authenticated:
+			raise Http404()
+		dataset = get_object_or_404(CuratedDataset, search_id=searchid)
+		if user.id != dataset.search_user.id:
+			raise Http404()
+		if not dataset.saved:
+			raise Http404()
+
+		if not dataset.zenodo_url is None:
+			return HttpResponseRedirect(dataset.zenodo_url)
+
+		conn_data = settings.IPFS_NODE
+		if len(conn_data) != 2:
+			raise Http404()
+
+		filename = slugify(dataset.search_label)
+		data = dataset.search_results
+		zip_filename = save_zip(data, filename)
+
+		ipfs_api = ipfslib.Connect(conn_data[0], conn_data[1])
+		cid = ipfslib.IPFS.add(ipfs_api, zip_filename, mode='b')
+
+		dataset.ipfs_cid = cid
+		dataset.save(update_fields=['ipfs_cid'])
+
+		return HttpResponseRedirect(dataset.ipfs_url)
+

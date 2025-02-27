@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class CuratedDataset(models.Model):
 	"""This is a class representing a curated dataset, which is effectively a saved search
@@ -26,9 +27,24 @@ class CuratedDataset(models.Model):
 	zenodo_doi = models.URLField(max_length=128, blank=True, null=True)
 	"""The DOI referring to this dataset on Zenodo."""
 
+	ipfs_cid = models.SlugField(max_length=128, null=True, blank=True)
+	"""The CID referring to this dataset on IPFS."""
+
 	@property
 	def saved(self):
 		return not('search_url' in self.search_results)
+
+	@property
+	def ipfs_url(self):
+		url = ''
+		if self.ipfs_cid:
+			try:
+				url = settings.IPFS_WEB_PROXY.replace('%CID%', self.ipfs_cid)
+			except:
+				url = ''
+		if url == '':
+			return 'https://ipfs.tech/'
+		return url
 
 	def table_headers(self):
 		if not self.saved:

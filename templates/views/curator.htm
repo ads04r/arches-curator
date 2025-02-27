@@ -25,6 +25,12 @@
 		<td><a href="{{ dataset.zenodo_doi }}">{{ dataset.zenodo_doi|truncatechars:80 }}</a></td>
 	</tr>
 {% endif %}
+{% if dataset.ipfs_cid %}
+	<tr>
+		<td><strong>CID:</strong>&nbsp;</td>
+		<td><a href="{{ dataset.ipfs_url }}">{{ dataset.ipfs_cid }}</a></td>
+	</tr>
+{% endif %}
 	<tr>
 		<td><strong>URL:</strong>&nbsp;</td>
 		<td><a href="{{ dataset.search_url }}">{{ dataset.search_url|truncatechars:80 }}</a></td>
