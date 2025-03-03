@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse, Http404, HttpResponseRedirect
 from django.template.defaultfilters import slugify
+from django.utils.functional import cached_property
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
@@ -14,6 +15,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from uuid import uuid4
 from ..models import CuratedDataset
 from ..util.arches import local_api_search
+from ..util.curator import is_zenodo_enabled, is_ipfs_enabled
 from ..util.zip import save_zip
 from ..zenodo.publish import zenodo_publish
 from ..zenodo.calculate import zenodo_contributors, zenodo_keywords, zenodo_dates
@@ -31,11 +33,20 @@ class Curator(View):
 		"""Remove all CuratedDataset objects that have no results and are over 48 hours old, to free up space and keep the database tidy."""
 		CuratedDataset.objects.filter(search_results_count=0, updated_time__lte=pytz.utc.localize(datetime.datetime.utcnow()) - datetime.timedelta(hours=48)).delete()
 
+	@cached_property
+	def exports_enabled(self):
+		ret = []
+		if is_zenodo_enabled():
+			ret.append('zenodo')
+		if is_ipfs_enabled():
+			ret.append('ipfs')
+		return ret
+
 	def get(self, request):
 		user = request.user
 		if not user.is_authenticated:
 			return JsonResponse({"datasets": []})
-		data = {"datasets": self.serialize_datasets(user.id)}
+		data = {"datasets": self.serialize_datasets(user.id), "exports_enabled": self.exports_enabled}
 		return JsonResponse(data)
 
 	def post(self, request):
@@ -70,10 +81,19 @@ class Curator(View):
 		else:
 			ret.save(update_fields=fields)
 
-		data = {"id": ret.search_id, "datasets": self.serialize_datasets(user.id)}
+		data = {"id": ret.search_id, "datasets": self.serialize_datasets(user.id), 'exports_enabled': self.exports_enabled}
 		return JsonResponse(data)
 
 class CuratorReport(PluginView):
+
+	@cached_property
+	def exports_enabled(self):
+		ret = []
+		if is_zenodo_enabled():
+			ret.append('zenodo')
+		if is_ipfs_enabled():
+			ret.append('ipfs')
+		return ret
 
 	def get(self, request, searchid=None):
 
@@ -126,6 +146,7 @@ class CuratorReport(PluginView):
 		context["nav"]["title"] = plugin.name
 
 		context['dataset'] = dataset
+		context['exports_enabled'] = self.exports_enabled
 
 		return render(request, "views/curator.htm", context)
 
@@ -162,6 +183,9 @@ class CuratorReportZenodo(View):
 
 	def post(self, request, searchid=None):
 
+		if not is_zenodo_enabled():
+			raise Http404()
+
 		user = request.user
 		if not user.is_authenticated:
 			raise Http404()
@@ -172,6 +196,7 @@ class CuratorReportZenodo(View):
 			raise Http404()
 
 		if not dataset.zenodo_url is None:
+			# If this dataset is already on Zenodo, don't publish it again, just return a link to it
 			return HttpResponseRedirect(dataset.zenodo_url)
 
 		filename = slugify(dataset.search_label)
@@ -195,6 +220,9 @@ class CuratorReportIPFS(View):
 
 	def post(self, request, searchid=None):
 
+		if not is_ipfs_enabled():
+			raise Http404()
+
 		user = request.user
 		if not user.is_authenticated:
 			raise Http404()
@@ -205,6 +233,7 @@ class CuratorReportIPFS(View):
 			raise Http404()
 
 		if not dataset.zenodo_url is None:
+			# If this dataset is already on IPFS, don't publish it again, just return a link to it
 			return HttpResponseRedirect(dataset.zenodo_url)
 
 		conn_data = settings.IPFS_NODE
