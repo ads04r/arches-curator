@@ -232,9 +232,9 @@ class CuratorReportIPFS(View):
 		if not dataset.saved:
 			raise Http404()
 
-		if not dataset.zenodo_url is None:
+		if not dataset.ipfs_cid is None:
 			# If this dataset is already on IPFS, don't publish it again, just return a link to it
-			return HttpResponseRedirect(dataset.zenodo_url)
+			return HttpResponseRedirect(dataset.ipfs_url)
 
 		conn_data = settings.IPFS_NODE
 		if len(conn_data) != 2:
