@@ -4,6 +4,8 @@ import zipfile
 import tempfile
 
 def save_zip(data, filename):
+	"""Simple function for creating a temporary ZIP file containing a specific set of data. The filename passed is the internal
+	filename of the data within the archive. The actual filename of the ZIP file created is returned by the function."""
 
 	# Create a ZIP file
 	zip_file = tempfile.mkstemp(prefix=filename, suffix='.zip')

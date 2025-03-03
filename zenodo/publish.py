@@ -37,7 +37,7 @@ def zenodo_publish(title, filename, description, extra_metadata=None):
 	if isinstance(extra_metadata, dict):
 		for k, v in extra_metadata.items():
 			metadata['metadata'][str(k)] = v
-	if isinstance(extra_metadata, list): # backwards compatibility
+	if isinstance(extra_metadata, list):
 		if len(extra_metadata) > 0:
 			metadata['metadata']['contributors'] = extra_metadata[0]
 		if len(extra_metadata) > 1:

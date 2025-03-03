@@ -32,10 +32,13 @@ class CuratedDataset(models.Model):
 
 	@property
 	def saved(self):
+		"""Returns true if the search has actually been carried out, false if the object has been created but not finalised.
+		This is necessary because creating a CuratedDataset from the UI is a two-step process."""
 		return not('search_url' in self.search_results)
 
 	@property
 	def ipfs_url(self):
+		"""Returns a web URL from which the IPFS dataset is available. Requres the IPFS_WEB_PROXY setting to be set."""
 		url = ''
 		if self.ipfs_cid:
 			try:
@@ -47,6 +50,7 @@ class CuratedDataset(models.Model):
 		return url
 
 	def table_headers(self):
+		"""Returns the headings row of a tabular representation of the data."""
 		if not self.saved:
 			return []
 		if not 'features' in self.search_results:
@@ -65,6 +69,7 @@ class CuratedDataset(models.Model):
 		return ret
 
 	def table_data(self):
+		"""Returns the data in the saved CuratedDataset in a tabular form, for display as an HTML table."""
 		headers = self.table_headers()
 		if len(headers) == 0:
 			return []

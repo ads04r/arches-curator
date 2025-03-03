@@ -24,6 +24,9 @@ import json, datetime, pytz, urllib.parse, ipfslib
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Curator(View):
+	"""This is the class for the main view. Its GET function simply returns a JSON object of previously created CuratedSearch instances
+	assigned to the logged-in user. It's generally called from the Knockout Javascript within the Arches UI. If called with a POST,
+	it creates a new curated search based on the arguments passed, and redirects to the new istance."""
 
 	def serialize_datasets(self, user_id):
 		res = [{'id': str(dataset.search_id), 'label': dataset.search_label, 'results': dataset.search_results_count} for dataset in CuratedDataset.objects.filter(search_user__id=user_id).exclude(search_label='').exclude(search_results_count=0)]
@@ -85,6 +88,9 @@ class Curator(View):
 		return JsonResponse(data)
 
 class CuratorReport(PluginView):
+	"""This is an HTML view for an actual CuratedSearch instance. It foregoes any deep Arches/KO integration and opts instead
+	for Django's templating system, mainly because I'm not too experienced with Knockout, but also because KO is being
+	dropped in favour of Vue.js."""
 
 	@cached_property
 	def exports_enabled(self):
@@ -180,6 +186,8 @@ class CuratorReport(PluginView):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class CuratorReportZenodo(View):
+	"""This is a view for Zenodo exports. It returns a 404 if the user is not logged in, or the required Django settings
+	are not set."""
 
 	def post(self, request, searchid=None):
 
@@ -217,6 +225,8 @@ class CuratorReportZenodo(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class CuratorReportIPFS(View):
+	"""This is a view for adding IPFS files. It returns a 404 if the user is not logged in, or the required Django settings
+	are not set."""
 
 	def post(self, request, searchid=None):
 
