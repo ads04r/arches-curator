@@ -21,10 +21,19 @@ git clone https://github.com/ads04r/arches-curator.git curator
 INSTALLED_APPS = [
     ...
     "arches",
-    "curator",
     "[project_name]"
+    "curator",
     ...
 ]
+```
+
+* As this plugin modifies part of the default Arches UI, we also need to make the plugin's templates directory visible. We can do this by modifying the `TEMPLATES` key in `settings.py`...
+```python
+TEMPLATES = build_templates_config(
+    debug=DEBUG,
+    app_root=APP_ROOT,
+    additional_directories=[os.path.join(os.path.dirname(APP_ROOT), 'curator', 'templates')],
+)
 ```
 
 * Add the plugin `curator` as a dependency in `pyproject.toml`...
