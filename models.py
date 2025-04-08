@@ -13,7 +13,7 @@ class CuratedDataset(models.Model):
 	"""The user who was logged in when this search was performed."""
 	search_url = models.URLField(max_length=2048)
 	"""The URL called in order to instigate this search."""
-	search_results = models.JSONField(default='{}')
+	search_results = models.JSONField(default=dict)
 	"""A GeoJSON object representing the results of this search, as they would have been presented to the user."""
 	search_results_count = models.IntegerField()
 	"""The number of results in this dataset, stored so it can be queried later without needing a re-count."""
